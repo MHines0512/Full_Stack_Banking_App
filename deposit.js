@@ -26,8 +26,8 @@ function DepositMsg(props){
 } 
 
 function DepositForm(props){
-  const [email, setEmail]   = React.useState('');
-  const [amount, setAmount] = React.useState('');
+  const [amount, setAmount]   = React.useState('');
+  const [balance, setBalance] = React.useState(0);
   const ctx = React.useContext(UserContext);  
 
   function handle(){
@@ -43,14 +43,12 @@ function DepositForm(props){
     props.setStatus('');      
     props.setShow(false);
   }
-
+console.log(ctx)
   return(<>
 
-    Email<br/>
-    <input type="input" 
-      className="form-control" 
-      placeholder="Enter email" 
-      value={email} onChange={e => setEmail(e.currentTarget.value)}/><br/>
+    Balance<br/>
+    <p>(ctx,users)</p>
+    <br/>
       
     Amount<br/>
     <input type="number" 
