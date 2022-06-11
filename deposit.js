@@ -1,64 +1,68 @@
 function Deposit(){
-  const [show, setShow]     = React.useState(true);
-  const [status, setStatus] = React.useState('');  
+  const [show, setShow]         = React.useState(true);
+  const [status, setStatus]     = React.useState('');
+  const [deposit, setDeposit]   = React.useState('');
+   const [balance, setBalance]   = React.useState(100);
+   const [disabled, setDisabled] = React.useState(true);
+  const ctx = React.useContext(UserContext); 
+  
+
+  const validate = amount => {
+    if(!amount) {
+      setStatus('Error: Please enter a value');
+      return false;
+    }
+    if(!Number(amount)) {
+      //(amount === NaN) doesnt work
+      setStatus('Error: Please enter a valid number');
+      return false;
+    }
+    if(amount < 0) {
+      setStatus("Error: Cannot deposit a negative amount");
+      return false;
+    }
+    return true;
+  }
+
+  const depositMoney = amount => {
+    if (!validate(amount)) return;
+    setBalance(Number(balance) + Number(amount));
+    setShow(false);
+    setStatus('');
+    ctx.users.push(Number(balance) + Number(amount));
+  }
+
+  function clearForm(){
+    setDeposit('');
+    setShow(true);
+  }
+
+  React.useEffect(() => {
+		if (!deposit) {
+			setDisabled(true);
+		}
+		else {
+			setDisabled(false);
+		}
+	}, [deposit]);
 
   return (
     <Card
-      bgcolor="warning"
+      bgcolor="success"
       header="Deposit"
       status={status}
-      body={show ? 
-        <DepositForm setShow={setShow} setStatus={setStatus}/> :
-        <DepositMsg setShow={setShow}/>}
+      body={show ? (  
+              <>
+              <h5>Balance: ${balance}</h5>
+              <br/>
+              Deposit Amount<br/>
+              <input type="deposit" className="form-control" id="deposit" placeholder="Deposit Amount" value={deposit} onChange={e => setDeposit(e.currentTarget.value)}/><br/>
+              <button type="submit" className="btn btn-light" onClick={() => depositMoney(deposit)} disabled={disabled}>Deposit</button>
+              </>
+            ):(
+              <>
+              <h5>Success</h5>
+              <button type="submit" className="btn btn-light" onClick={clearForm}>Make another deposit?</button>
+              </>
+            )}
     />
-  )
-}
-
-function DepositMsg(props){
-  return (<>
-    <h5>Success</h5>
-    <button type="submit" 
-      className="btn btn-light" 
-      onClick={() => props.setShow(true)}>
-        Deposit again
-    </button>
-  </>);
-} 
-
-function DepositForm(props){
-  const [amount, setAmount]   = React.useState('');
-  const [balance, setBalance] = React.useState(0);
-  const ctx = React.useContext(UserContext);  
-
-  function handle(){
-    console.log(email,amount);
-    const user = ctx.users.find((user) => user.email == email);
-    if (!user) {
-      props.setStatus('fail!');
-      return;      
-    }
-
-    user.balance = user.balance + Number(amount);
-    console.log(user);
-    props.setStatus('');      
-    props.setShow(false);
-  }
-console.log(ctx)
-  return(<>
-
-    Balance<br/>
-    <p>(ctx,users)</p>
-    <br/>
-      
-    Amount<br/>
-    <input type="number" 
-      className="form-control" 
-      placeholder="Enter amount" 
-      value={amount} onChange={e => setAmount(e.currentTarget.value)}/><br/>
-
-    <button type="submit" 
-      className="btn btn-light" 
-      onClick={handle}>Deposit</button>
-
-  </>);
-}
